@@ -1,6 +1,10 @@
 defmodule Poeticoins.Exchanges.CoinbaseClient do
   use GenServer
 
+  alias Poeticoins.{Trade, Product}
+
+  @exchange_name "coinbase"
+
   def start_link(currency_pairs, options \\ []) do
     GenServer.start_link(__MODULE__, currency_pairs, options)
   end
@@ -41,11 +45,27 @@ defmodule Poeticoins.Exchanges.CoinbaseClient do
   end
 
   def handle_ws_message(%{"type" => "ticker"} = msg, state) do
+    trade =
+      msg
+      |> message_to_trade()
+      |> IO.inspect(label: "trade")
+
     {:noreply, state}
   end
 
   def handle_ws_message(msg, state) do
     {:noreply, state}
+  end
+
+  def message_to_trade(msg) do
+    currency_pair = msg["product_id"]
+
+    Trade.new(
+      product: Product.new(@exchange_name, currency_pair),
+      price: msg["price"],
+      volume: msg["last_size"],
+      traded_at: datetime_from_string(msg["time"])
+    )
   end
 
   defp subscribe(state) do
@@ -61,5 +81,10 @@ defmodule Poeticoins.Exchanges.CoinbaseClient do
     } |> Jason.encode!()
 
     [{:text, msg}]
+  end
+
+  defp datetime_from_string(time_string) do
+    {:ok, dt,_} = DateTime.from_iso8601(time_string)
+    dt
   end
 end

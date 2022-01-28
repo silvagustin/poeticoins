@@ -48,7 +48,8 @@ defmodule Poeticoins.MixProject do
       {:plug_cowboy, "~> 2.5"},
       # HTTP/1.1, HTTP/2 and Websocket client for Erlang/OTP.
       {:gun, "~> 1.3"},
-      {:cowlib, "~> 2.11.0", override: true}
+      {:cowlib, "~> 2.11.0", override: true},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 
