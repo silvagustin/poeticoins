@@ -2,33 +2,14 @@ defmodule Poeticoins.Exchanges.BitstampClient do
   alias Poeticoins.{Trade, Product}
   alias Poeticoins.Exchanges.Client
 
-  import Client, only: [validate_required: 2]
+  require Client
 
-  @behaviour Client
-
-  @impl true
-  def exchange_name, do: "bitstamp"
-
-  @impl true
-  def server_host, do: 'ws.bitstamp.net'
-
-  @impl true
-  def server_port, do: 443
-
-  @impl true
-  def handle_ws_message(%{"event" => "trade"} = msg, state) do
-    _trade =
-      msg
-      |> message_to_trade()
-      |> IO.inspect(label: "trade")
-
-    {:noreply, state}
-  end
-
-  def handle_ws_message(msg, state) do
-    IO.inspect(msg, label: "unhandled message")
-    {:noreply, state}
-  end
+  Client.defclient(
+    exchange_name: "bitstamp",
+    host: 'ws.bitstamp.net',
+    port: 443,
+    currency_pairs: ["btcusd", "ethusd", "ltcusd", "btceur", "etheur", "ltceur"]
+  )
 
   @impl true
   def subscription_frames(currency_pairs) do
@@ -44,6 +25,21 @@ defmodule Poeticoins.Exchanges.BitstampClient do
     } |> Jason.encode!()
 
     {:text, msg}
+  end
+
+  @impl true
+  def handle_ws_message(%{"event" => "trade"} = msg, state) do
+    _trade =
+      msg
+      |> message_to_trade()
+      |> IO.inspect(label: "trade")
+
+    {:noreply, state}
+  end
+
+  def handle_ws_message(msg, state) do
+    IO.inspect(msg, label: "unhandled message")
+    {:noreply, state}
   end
 
   @spec message_to_trade(map()) :: {:ok, Trade.t()} | {:error, any()}

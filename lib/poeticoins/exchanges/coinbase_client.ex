@@ -2,18 +2,25 @@ defmodule Poeticoins.Exchanges.CoinbaseClient do
   alias Poeticoins.{Trade, Product}
   alias Poeticoins.Exchanges.Client
 
-  import Client, only: [validate_required: 2]
+  require Client
 
-  @behaviour Client
+  Client.defclient(
+    exchange_name: "coinbase",
+    host: 'https://ws-feed.pro.coinbase.com/',
+    port: 443,
+    currency_pairs: ["BTC-USD", "ETH-USD", "LTC-USD", "BTC-EUR", "ETH-EUR", "LTC-EUR"]
+  )
 
   @impl true
-  def exchange_name, do: "coinbase"
+  def subscription_frames(currency_pairs) do
+    msg = %{
+      "type" => "subscribe",
+      "product_ids" => currency_pairs,
+      "channels" => ["ticker"]
+    } |> Jason.encode!()
 
-  @impl true
-  def server_host, do: 'https://ws-feed.pro.coinbase.com/'
-
-  @impl true
-  def server_port, do: 443
+    [{:text, msg}]
+  end
 
   @impl true
   def handle_ws_message(%{"type" => "ticker"} = msg, state) do
@@ -28,17 +35,6 @@ defmodule Poeticoins.Exchanges.CoinbaseClient do
   def handle_ws_message(msg, state) do
     IO.inspect(msg, label: "unhandled message")
     {:noreply, state}
-  end
-
-  @impl true
-  def subscription_frames(currency_pairs) do
-    msg = %{
-      "type" => "subscribe",
-      "product_ids" => currency_pairs,
-      "channels" => ["ticker"]
-    } |> Jason.encode!()
-
-    [{:text, msg}]
   end
 
   @spec message_to_trade(map()) :: {:ok, Trade.t()} | {:error, any()}
