@@ -8,8 +8,7 @@ config :poeticoins, PoeticoinsWeb.Endpoint,
   server: false
 
 # In test we don't send emails.
-config :poeticoins, Poeticoins.Mailer,
-  adapter: Swoosh.Adapters.Test
+config :poeticoins, Poeticoins.Mailer, adapter: Swoosh.Adapters.Test
 
 # Print only warnings and errors during test
 config :logger, level: :warn

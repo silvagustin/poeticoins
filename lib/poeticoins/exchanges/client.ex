@@ -2,11 +2,11 @@ defmodule Poeticoins.Exchanges.Client do
   use GenServer
 
   @type t :: %__MODULE__{
-    module: module(),
-    conn: pid(),
-    conn_ref: reference(),
-    currency_pairs: [String.t()]
-  }
+          module: module(),
+          conn: pid(),
+          conn_ref: reference(),
+          currency_pairs: [String.t()]
+        }
 
   @callback exchange_name() :: String.t()
   @callback server_host() :: list()
@@ -41,7 +41,7 @@ defmodule Poeticoins.Exchanges.Client do
         {:noreply, state}
       end
 
-      defoverridable [handle_ws_message: 2]
+      defoverridable handle_ws_message: 2
     end
   end
 
