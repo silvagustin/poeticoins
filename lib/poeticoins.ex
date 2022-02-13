@@ -12,4 +12,6 @@ defmodule Poeticoins do
 
   defdelegate get_last_trade(prod), to: Poeticoins.Historical
   defdelegate get_last_trades(prod), to: Poeticoins.Historical
+
+  defdelegate available_products(), to: Poeticoins.Exchanges
 end
