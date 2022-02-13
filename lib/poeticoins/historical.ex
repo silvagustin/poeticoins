@@ -1,4 +1,4 @@
-defmodule Poeticoins.Historial do
+defmodule Poeticoins.Historical do
   use GenServer
 
   alias Poeticoins.{Product, Trade, Exchanges}
@@ -15,7 +15,7 @@ defmodule Poeticoins.Historial do
     GenServer.call(pid, {:get_last_trade, product})
   end
 
-  @spec get_last_trades(pid() | atom(), [Product.t()]) :: [Trade.t()]
+  @spec get_last_trades(pid() | atom(), [Product.t()]) :: [Trade.t() | nil]
   def get_last_trades(pid \\ __MODULE__, products) do
     GenServer.call(pid, {:get_last_trades, products})
   end
